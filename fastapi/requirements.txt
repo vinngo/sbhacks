@@ -6,6 +6,9 @@ python-dotenv>=1.0.0
 # LangChain
 langchain>=0.3.0
 langchain-mcp>=0.1.0
+langchain-core>=0.3.0
+langchain-mcp-adapters>=0.2.0
+langchain-google-genai>=2.0.0
 
 # MCP Client
 mcp>=1.0.0
@@ -24,3 +27,5 @@ starlette>=0.41.0
 
 # Dev
 ruff>=0.7.0
+
+
