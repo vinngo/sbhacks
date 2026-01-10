@@ -1,0 +1,100 @@
+"use client";
+
+import { useMemo } from "react";
+import { cn, formatDate, formatDayOfWeek, isSameDay } from "@/lib/utils";
+import { TimeSlot } from "./time-slot";
+import { EventBlock } from "./event-block";
+import { ProposedBlock } from "./proposed-block";
+import type { CalendarEvent, ProposedEvent } from "@/lib/types";
+
+type DayColumnProps = {
+  date: Date;
+  existingEvents: CalendarEvent[];
+  proposedEvents: ProposedEvent[];
+  startHour?: number;
+  endHour?: number;
+};
+
+export function DayColumn({
+  date,
+  existingEvents,
+  proposedEvents,
+  startHour = 6,
+  endHour = 22,
+}: DayColumnProps) {
+  const isToday = isSameDay(date, new Date());
+
+  // Filter events for this day
+  const dayExistingEvents = useMemo(
+    () => existingEvents.filter((event) => isSameDay(event.start, date)),
+    [existingEvents, date],
+  );
+
+  const dayProposedEvents = useMemo(
+    () => proposedEvents.filter((event) => isSameDay(event.start, date)),
+    [proposedEvents, date],
+  );
+
+  // Generate time slots (15-minute increments)
+  const timeSlots = useMemo(() => {
+    const slots: { hour: number; minute: number }[] = [];
+    for (let hour = startHour; hour < endHour; hour++) {
+      for (let minute = 0; minute < 60; minute += 15) {
+        slots.push({ hour, minute });
+      }
+    }
+    return slots;
+  }, [startHour, endHour]);
+
+  // Calculate total height based on hours
+  const totalHours = endHour - startHour;
+  const columnHeight = totalHours * 60; // 60px per hour
+
+  return (
+    <div className="flex flex-col flex-1 min-w-0">
+      {/* Day header */}
+      <div
+        className={cn(
+          "h-[60px] flex flex-col items-center justify-center border-b border-border sticky top-0 bg-background z-10",
+          isToday && "bg-primary/5",
+        )}
+      >
+        <div className="text-sm font-medium">{formatDayOfWeek(date)}</div>
+        <div className={cn("text-lg font-semibold", isToday && "text-primary")}>
+          {formatDate(date).split(" ")[1]}
+        </div>
+      </div>
+
+      {/* Time grid */}
+      <div
+        className="relative flex-1 border-r border-border last:border-r-0"
+        style={{ height: `${columnHeight}px` }}
+      >
+        {/* Time slots (droppable zones) */}
+        {timeSlots.map(({ hour, minute }) => (
+          <TimeSlot
+            key={`${date.toISOString()}-${hour}-${minute}`}
+            id={`slot-${date.toISOString()}-${hour}-${minute}`}
+            date={date}
+            hour={hour}
+            minute={minute}
+          />
+        ))}
+
+        {/* Existing events (solid, not draggable) */}
+        {dayExistingEvents.map((event) => (
+          <EventBlock key={event.id} event={event} dayStartHour={startHour} />
+        ))}
+
+        {/* Proposed events (draggable) */}
+        {dayProposedEvents.map((event) => (
+          <ProposedBlock
+            key={event.id}
+            event={event}
+            dayStartHour={startHour}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
