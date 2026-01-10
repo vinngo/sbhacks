@@ -23,7 +23,7 @@ source sbhacksvenv/bin/activate
 ## Step 1: Install our dependencies
 ```
 
-#still in the temrinal under /fastapi
+#still in the terminal under /fastapi
 
 
 pip install -r requirements.txt
