@@ -51,7 +51,7 @@ export function DayColumn({
   const columnHeight = totalHours * 60; // 60px per hour
 
   return (
-    <div className="flex flex-col flex-1 min-w-0">
+    <div className="flex flex-col flex-1 min-w-0 border-r ">
       {/* Day header */}
       <div
         className={cn(

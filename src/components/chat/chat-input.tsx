@@ -34,7 +34,7 @@ export function ChatInput({
   };
 
   return (
-    <div className="border-t border-border">
+    <div className="border-t border-border relative">
       <Textarea
         value={input}
         onChange={(e) => setInput(e.target.value)}

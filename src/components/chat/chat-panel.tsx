@@ -3,6 +3,7 @@
 import { MessageList } from "./message-list";
 import { ChatInput } from "./chat-input";
 import { useChat } from "@/hooks/use-chat";
+import { ActionBar } from "@/components/shared/action-bar";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { MessageSquare } from "lucide-react";
 
@@ -18,8 +19,13 @@ export function ChatPanel() {
         </CardTitle>
       </CardHeader>
       <CardContent className="flex-1 flex flex-col p-0 overflow-hidden">
-        <MessageList messages={messages} isStreaming={isStreaming} />
-        <ChatInput onSend={sendMessage} disabled={isStreaming} />
+        <div className="flex-1 overflow-auto">
+          <MessageList messages={messages} isStreaming={isStreaming} />
+        </div>
+        <div className="sticky bottom-0 bg-background border-t">
+          <ActionBar />
+          <ChatInput onSend={sendMessage} disabled={isStreaming} />
+        </div>
       </CardContent>
     </Card>
   );

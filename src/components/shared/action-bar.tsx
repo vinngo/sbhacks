@@ -1,28 +1,34 @@
-'use client'
+"use client";
 
-import { Button } from '@/components/ui/button'
-import { useScheduler } from '@/hooks/use-scheduler'
-import { useCommitEvents } from '@/hooks/use-calendar'
-import { useSchedulerContext } from '@/context/scheduler-context'
-import { Check, X, Loader2 } from 'lucide-react'
+import { Button } from "@/components/ui/button";
+import { useScheduler } from "@/hooks/use-scheduler";
+import { useCommitEvents } from "@/hooks/use-calendar";
+import { useSchedulerContext } from "@/context/scheduler-context";
+import { Check, X, Loader2 } from "lucide-react";
 
 export function ActionBar() {
-  const { proposedEvents, hasProposals, clearProposals } = useScheduler()
-  const { status } = useSchedulerContext()
-  const commitMutation = useCommitEvents()
+  const { proposedEvents, hasProposals, clearProposals } = useScheduler();
+  const { status } = useSchedulerContext();
+  const commitMutation = useCommitEvents();
 
-  const isCommitting = status === 'committing'
-  const uncommittedEvents = proposedEvents.filter(e => e.status !== 'committed')
-  const hasUncommitted = uncommittedEvents.length > 0
+  const isCommitting = status === "committing";
+  const uncommittedEvents = proposedEvents.filter(
+    (e) => e.status !== "committed",
+  );
+  const hasUncommitted = uncommittedEvents.length > 0;
 
   const handleAccept = () => {
     if (uncommittedEvents.length > 0) {
-      commitMutation.mutate(uncommittedEvents)
+      commitMutation.mutate(uncommittedEvents);
     }
-  }
+  };
 
   const handleCancel = () => {
-    clearProposals()
+    clearProposals();
+  };
+
+  if (!hasProposals) {
+    return null;
   }
 
   return (
@@ -30,11 +36,11 @@ export function ActionBar() {
       <div className="text-sm text-muted-foreground">
         {hasProposals ? (
           <>
-            {uncommittedEvents.length} event{uncommittedEvents.length !== 1 ? 's' : ''}{' '}
-            to schedule
+            {uncommittedEvents.length} event
+            {uncommittedEvents.length !== 1 ? "s" : ""} to schedule
           </>
         ) : (
-          'No events proposed yet'
+          "No events proposed yet"
         )}
       </div>
       <div className="flex gap-2">
@@ -64,5 +70,5 @@ export function ActionBar() {
         </Button>
       </div>
     </div>
-  )
+  );
 }

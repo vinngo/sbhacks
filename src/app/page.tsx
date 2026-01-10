@@ -1,16 +1,31 @@
 "use client";
 
+import { useSession, signIn } from "next-auth/react";
 import { CalendarView } from "@/components/calendar/calendar-view";
 import { ChatPanel } from "@/components/chat/chat-panel";
 import { ActionBar } from "@/components/shared/action-bar";
+import { LoginScreen } from "@/components/auth/login-screen";
 import { ConnectionStatus } from "@/components/shared/connection-status";
 import { useCalendarEvents } from "@/hooks/use-calendar";
 import { useSchedulerContext } from "@/context/scheduler-context";
-import { USE_MOCK_DATA } from "@/lib/mock-data";
 
 export default function Home() {
+  const { data: session, status } = useSession();
   const { currentWeek } = useSchedulerContext();
   const { isLoading, isError } = useCalendarEvents(currentWeek);
+
+  // Show login screen if not authenticated
+  if (status === "loading") {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-muted-foreground">Loading...</div>
+      </div>
+    );
+  }
+
+  if (status === "unauthenticated") {
+    return <LoginScreen onGoogleLogin={() => signIn("google")} />;
+  }
 
   // Determine connection status
   const connectionStatus = isLoading
@@ -38,9 +53,6 @@ export default function Home() {
           <ChatPanel />
         </div>
       </div>
-
-      {/* Action Bar */}
-      <ActionBar />
     </main>
   );
 }

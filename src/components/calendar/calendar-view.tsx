@@ -91,29 +91,29 @@ export function CalendarView({
       {/* Calendar grid */}
       <DndContext onDragEnd={handleDragEnd}>
         <div className="flex flex-1 overflow-auto">
-          {/* Time labels column */}
-          <div className="flex flex-col w-16 flex-shrink-0 border-r border-border">
-            {/* Empty header space */}
-            <div className="h-[60px] border-b border-border" />
-            {/* Hour labels */}
-            <div className="relative">
-              {hours.map((hour, index) => (
-                <div
-                  key={hour}
-                  className="h-[60px] text-xs text-muted-foreground pr-2 relative"
-                >
-                  <span className="absolute top-0 right-2 -translate-y-1/2">
-                    {formatTime(
-                      new Date().setHours(hour, 0, 0, 0) as unknown as Date,
-                    )}
-                  </span>
-                </div>
-              ))}
-            </div>
-          </div>
-
           {/* Day columns */}
           <div className="flex flex-1 min-w-0">
+            <div className="flex flex-col w-16 border-r border-border">
+              {/* Empty header space */}
+              <div>
+                <div className="h-[49px] border-b border-border" />
+                {/* Hour labels */}
+                <div className="">
+                  {hours.map((hour, index) => (
+                    <div
+                      key={hour}
+                      className="h-[60px] text-xs text-muted-foreground pr-2 relative"
+                    >
+                      <span className="top-0 right-2 -translate-y-1/2">
+                        {formatTime(
+                          new Date().setHours(hour, 0, 0, 0) as unknown as Date,
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
             {weekDays.map((date) => (
               <DayColumn
                 key={date.toISOString()}
