@@ -37,7 +37,8 @@ pip3 install -r requirements.txt
 
 ### starting FastAPI
 ```
-
+Starting fastapi:
+uvicorn main:app --reload
 
 
 ```
