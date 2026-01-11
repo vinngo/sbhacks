@@ -192,8 +192,8 @@ export function EventBlock({ event, dayStartHour = 6, onResize }: EventBlockProp
         transition={{ duration: 0.15 }}
         onMouseDown={handleResizeStart("top")}
       >
-        <motion.div 
-          className="w-10 h-1.5 bg-gray-400 rounded-full"
+        <motion.div
+          className="w-10 h-1 bg-gray-400 rounded-full"
           whileHover={{ scale: 1.2, backgroundColor: "#6b7280" }}
           transition={{ duration: 0.1 }}
         />
@@ -232,8 +232,8 @@ export function EventBlock({ event, dayStartHour = 6, onResize }: EventBlockProp
         transition={{ duration: 0.15 }}
         onMouseDown={handleResizeStart("bottom")}
       >
-        <motion.div 
-          className="w-10 h-1.5 bg-gray-400 rounded-full"
+        <motion.div
+          className="w-10 h-1 bg-gray-400 rounded-full"
           whileHover={{ scale: 1.2, backgroundColor: "#6b7280" }}
           transition={{ duration: 0.1 }}
         />
