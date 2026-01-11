@@ -64,7 +64,7 @@ Feel free to drag these events to different times, or let me know if you'd prefe
 export async function POST(request: NextRequest) {
   const body = await request.json();
 
-  if (USE_MOCK_DATA || true) {
+  if (USE_MOCK_DATA) {
     // Return streaming mock response
     const encoder = new TextEncoder();
     const stream = new ReadableStream({
