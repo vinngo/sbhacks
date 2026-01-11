@@ -61,7 +61,7 @@ export function ChatInput({
           disabled={!canSend}
           className={cn(
             "absolute right-1.5 bottom-1.5 h-7 w-7 rounded-full",
-            "flex items-center justify-center transition-all duration-150",
+            "flex items-center justify-center transition-all duration-150 cursor-pointer",
             canSend
               ? "bg-foreground text-background"
               : "bg-transparent text-muted-foreground/30",
