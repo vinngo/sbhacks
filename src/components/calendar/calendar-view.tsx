@@ -171,7 +171,7 @@ export function CalendarView({
                 {hours.map((hour) => (
                   <div
                     key={hour}
-                    className="h-[60px] text-xs text-muted-foreground flex items-start justify-center relative"
+                    className="h-[60px] text-xs text-foreground flex items-start justify-center relative"
                   >
                     <span className="-translate-y-1/2">
                       {formatTime(
