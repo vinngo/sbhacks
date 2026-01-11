@@ -1,13 +1,20 @@
-import { NextRequest } from 'next/server'
-import { USE_MOCK_DATA } from '@/lib/mock-data'
-import { addDays, setHours, setMinutes, startOfWeek } from 'date-fns'
+import { NextRequest } from "next/server";
+import { USE_MOCK_DATA } from "@/lib/mock-data";
+import { addDays, setHours, setMinutes, startOfWeek } from "date-fns";
 
-const FASTAPI_URL = process.env.FASTAPI_URL || 'http://localhost:8000'
+const FASTAPI_URL = process.env.FASTAPI_URL || "http://localhost:8000";
 
 // Helper to create dates for mock response
-function createMockDate(dayOffset: number, hour: number, minute: number = 0): string {
-  const weekStart = startOfWeek(new Date(), { weekStartsOn: 0 })
-  return setMinutes(setHours(addDays(weekStart, dayOffset), hour), minute).toISOString()
+function createMockDate(
+  dayOffset: number,
+  hour: number,
+  minute: number = 0,
+): string {
+  const weekStart = startOfWeek(new Date(), { weekStartsOn: 0 });
+  return setMinutes(
+    setHours(addDays(weekStart, dayOffset), hour),
+    minute,
+  ).toISOString();
 }
 
 // Mock streaming response
@@ -43,73 +50,73 @@ I've scheduled **Focus Work** for Monday 10 AM - 12 PM, giving you a solid 2-hou
 
 **Review Session** is placed on Wednesday 9 - 10:30 AM, taking advantage of the morning slot.
 
-Feel free to drag these events to different times, or let me know if you'd prefer different slots!`
+Feel free to drag these events to different times, or let me know if you'd prefer different slots!`;
 
   // Stream response word by word
-  const words = response.split(' ')
+  const words = response.split(" ");
   for (const word of words) {
-    yield word + ' '
-    await new Promise(resolve => setTimeout(resolve, 25))
+    yield word + " ";
+    await new Promise((resolve) => setTimeout(resolve, 25));
   }
 }
 
 // POST /api/chat - Stream chat response
 export async function POST(request: NextRequest) {
-  const body = await request.json()
+  const body = await request.json();
 
-  if (USE_MOCK_DATA) {
+  if (USE_MOCK_DATA || true) {
     // Return streaming mock response
-    const encoder = new TextEncoder()
+    const encoder = new TextEncoder();
     const stream = new ReadableStream({
       async start(controller) {
         try {
           for await (const chunk of mockChatStream()) {
-            controller.enqueue(encoder.encode(chunk))
+            controller.enqueue(encoder.encode(chunk));
           }
-          controller.close()
+          controller.close();
         } catch (error) {
-          controller.error(error)
+          controller.error(error);
         }
       },
-    })
+    });
 
     return new Response(stream, {
       headers: {
-        'Content-Type': 'text/plain; charset=utf-8',
-        'Transfer-Encoding': 'chunked',
+        "Content-Type": "text/plain; charset=utf-8",
+        "Transfer-Encoding": "chunked",
       },
-    })
+    });
   }
 
   try {
     // Proxy to FastAPI backend
     const response = await fetch(`${FASTAPI_URL}/api/chat`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify(body),
-    })
+    });
 
     if (!response.ok) {
-      throw new Error(`FastAPI error: ${response.status}`)
+      throw new Error(`FastAPI error: ${response.status}`);
     }
 
     // Stream the response back
     if (response.body) {
       return new Response(response.body, {
         headers: {
-          'Content-Type': 'text/plain; charset=utf-8',
-          'Transfer-Encoding': 'chunked',
+          "Content-Type": "text/plain; charset=utf-8",
+          "Transfer-Encoding": "chunked",
         },
-      })
+      });
     }
 
-    throw new Error('No response body')
+    throw new Error("No response body");
   } catch (error) {
-    console.error('Chat API error:', error)
-    return new Response('Sorry, I encountered an error. Please try again.', {
+    console.error("Chat API error:", error);
+    return new Response("Sorry, I encountered an error. Please try again.", {
       status: 500,
-    })
+    });
   }
 }

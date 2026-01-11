@@ -1,13 +1,12 @@
 "use client";
 
-import { useSession, signIn } from "next-auth/react";
+import { useSession, signIn, signOut } from "next-auth/react";
 import { CalendarView } from "@/components/calendar/calendar-view";
 import { ChatPanel } from "@/components/chat/chat-panel";
-import { ActionBar } from "@/components/shared/action-bar";
 import { LoginScreen } from "@/components/auth/login-screen";
-import { ConnectionStatus } from "@/components/shared/connection-status";
 import { useCalendarEvents } from "@/hooks/use-calendar";
 import { useSchedulerContext } from "@/context/scheduler-context";
+import { Button } from "@/components/ui/button";
 
 export default function Home() {
   const { data: session, status } = useSession();
@@ -38,7 +37,15 @@ export default function Home() {
     <main className="flex flex-col h-screen">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-background">
-        <h1 className="text-xl font-bold">Schedule Optimizer</h1>
+        <h1 className="text-xl font-light font-serif">Schedule Optimizer</h1>
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className="font-serif"
+        >
+          Logout
+        </Button>
       </header>
 
       {/* Main content area */}
