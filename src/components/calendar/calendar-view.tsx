@@ -160,7 +160,7 @@ export function CalendarView({
         <div className="flex flex-1 overflow-auto">
           {/* Day columns */}
           <div className="flex flex-1 min-w-0">
-            <div className="flex flex-col w-16 border-r border-border">
+            <div className="flex flex-col w-20 border-r border-border">
               {/* Empty header space */}
               <div>
                 <div className="h-[49px] border-b border-border" />
@@ -169,9 +169,9 @@ export function CalendarView({
                   {hours.map((hour, index) => (
                     <div
                       key={hour}
-                      className="h-[60px] text-xs text-muted-foreground pr-2 relative"
+                      className="h-[60px] text-xs text-muted-foreground flex items-start justify-center relative"
                     >
-                      <span className="top-0 right-2 -translate-y-1/2">
+                      <span className="-translate-y-1/2">
                         {formatTime(
                           new Date().setHours(hour, 0, 0, 0) as unknown as Date,
                         )}
