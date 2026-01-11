@@ -41,15 +41,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
       {/* Messages area */}
       <div className="flex-1 overflow-hidden flex flex-col bg-background">
         {!hasMessages ? (
-          <div className="flex-1 flex flex-col items-center justify-center px-6 text-center">
-            <div className="h-14 w-14 rounded-full bg-muted flex items-center justify-center mb-3">
-              <MessageCircle className="h-7 w-7 text-muted-foreground" />
-            </div>
-            <p className="text-sm text-muted-foreground max-w-[220px]">
-              Describe tasks you&apos;d like to schedule and I&apos;ll find the
-              best times.
-            </p>
-          </div>
+          <div className="flex-1" />
         ) : (
           <div className="flex-1 overflow-auto">
             <MessageList messages={messages} isStreaming={isStreaming} />

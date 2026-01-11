@@ -2,7 +2,7 @@
 
 import { useState, useCallback, KeyboardEvent } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { ArrowUp } from "lucide-react";
+import { ArrowUp, MessageCircle } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ChatInputProps = {
@@ -42,6 +42,9 @@ export function ChatInput({
           "transition-all duration-200",
         )}
       >
+        <div className="absolute left-3 bottom-2.5 text-muted-foreground">
+          <MessageCircle className="h-4 w-4" />
+        </div>
         <Textarea
           value={input}
           onChange={(e) => setInput(e.target.value)}
@@ -49,7 +52,7 @@ export function ChatInput({
           placeholder={placeholder}
           disabled={disabled}
           className={cn(
-            "min-h-[36px] max-h-[100px] resize-none border-0 bg-transparent pl-4 pr-11 py-2",
+            "min-h-[36px] max-h-[100px] resize-none border-0 bg-transparent pl-9 pr-11 py-2",
             "text-[15px] placeholder:text-muted-foreground",
             "focus-visible:ring-0 focus-visible:ring-offset-0",
             disabled && "opacity-50",
