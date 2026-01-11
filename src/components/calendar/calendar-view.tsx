@@ -9,7 +9,6 @@ import { useScheduler } from "@/hooks/use-scheduler";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { addDays } from "date-fns";
-import { useQueryClient } from "@tanstack/react-query";
 
 type CalendarViewProps = {
   startHour?: number;
@@ -23,7 +22,6 @@ export function CalendarView({
   const { existingEvents, proposedEvents, currentWeek, setCurrentWeek, setExistingEvents } =
     useSchedulerContext();
   const { moveEvent } = useScheduler();
-  const queryClient = useQueryClient();
 
   const weekDays = getWeekDays(currentWeek);
   const totalHours = endHour - startHour;
@@ -56,6 +54,9 @@ export function CalendarView({
       const newEnd = new Date(newStart.getTime() + duration);
 
       if (isExisting) {
+        // Store previous state for rollback
+        const previousEvents = [...existingEvents];
+        
         // Handle existing event - update via API
         setExistingEvents(
           existingEvents.map((e) =>
@@ -74,25 +75,26 @@ export function CalendarView({
           });
 
           if (!res.ok) throw new Error("Failed to update");
-
-          // Refresh calendar data
-          queryClient.invalidateQueries({ queryKey: ["calendar"] });
+          // Success - keep local state
         } catch (error) {
           console.error("Failed to move event:", error);
-          // Refresh to revert
-          queryClient.invalidateQueries({ queryKey: ["calendar"] });
+          // Rollback on error
+          setExistingEvents(previousEvents);
         }
       } else {
         // Handle proposed event
         moveEvent(draggedEvent.id, newStart, newEnd);
       }
     },
-    [moveEvent, existingEvents, setExistingEvents, queryClient],
+    [moveEvent, existingEvents, setExistingEvents],
   );
 
   // Handle event resize
   const handleEventResize = useCallback(
     async (eventId: string, newStart: Date, newEnd: Date) => {
+      // Store previous state for rollback on error
+      const previousEvents = [...existingEvents];
+      
       // Update local state optimistically
       setExistingEvents(
         existingEvents.map((e) =>
@@ -112,16 +114,14 @@ export function CalendarView({
         });
 
         if (!res.ok) throw new Error("Failed to update");
-
-        // Refresh calendar data
-        queryClient.invalidateQueries({ queryKey: ["calendar"] });
+        // Success - keep local state as is
       } catch (error) {
         console.error("Failed to resize event:", error);
-        // Refresh to revert
-        queryClient.invalidateQueries({ queryKey: ["calendar"] });
+        // Rollback to previous state on error
+        setExistingEvents(previousEvents);
       }
     },
-    [existingEvents, setExistingEvents, queryClient]
+    [existingEvents, setExistingEvents]
   );
 
   // Week navigation

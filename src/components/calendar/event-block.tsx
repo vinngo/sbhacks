@@ -37,6 +37,9 @@ export function EventBlock({ event, dayStartHour = 6, onResize }: EventBlockProp
     initialTop: number;
     initialHeight: number;
   } | null>(null);
+  
+  // Track if we just finished resizing to prevent immediate reset
+  const justFinishedResizing = useRef(false);
 
   const { top, height } = getEventPosition(
     event.start,
@@ -54,6 +57,12 @@ export function EventBlock({ event, dayStartHour = 6, onResize }: EventBlockProp
 
   // Update motion values when event changes (not during resize)
   useEffect(() => {
+    // Skip reset if we just finished resizing - wait for parent to update
+    if (justFinishedResizing.current) {
+      justFinishedResizing.current = false;
+      return;
+    }
+    
     if (!isResizing) {
       motionTop.set(top);
       motionHeight.set(height);
@@ -118,6 +127,9 @@ export function EventBlock({ event, dayStartHour = 6, onResize }: EventBlockProp
         newStart.setMinutes(Math.round(newStart.getMinutes() / 15) * 15, 0, 0);
         newEnd.setMinutes(Math.round(newEnd.getMinutes() / 15) * 15, 0, 0);
 
+        // Prevent useEffect from resetting before parent updates
+        justFinishedResizing.current = true;
+        
         onResize(event.id, newStart, newEnd);
       }
 

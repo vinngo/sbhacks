@@ -2,7 +2,7 @@ import { addDays, setHours, setMinutes, startOfWeek } from "date-fns";
 import type { CalendarEvent, ProposedEvent, Task, Message } from "./types";
 
 // Toggle this to switch between mock data and real API
-export const USE_MOCK_DATA = false;
+export const USE_MOCK_DATA = true;
 
 // Get the start of the current week for consistent mock data
 const weekStart = startOfWeek(new Date(), { weekStartsOn: 0 });
