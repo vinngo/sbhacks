@@ -60,7 +60,7 @@ export function DayColumn({
       {/* Day header */}
       <div
         className={cn(
-          "h-[60px] flex flex-col items-center justify-center border-b border-border sticky top-0 bg-background z-10",
+          "h-[60px] flex flex-col items-center justify-center sticky top-0 bg-background z-10",
           isToday && "bg-primary/5",
         )}
       >
