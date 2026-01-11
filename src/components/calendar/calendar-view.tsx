@@ -9,6 +9,8 @@ import { useScheduler } from "@/hooks/use-scheduler";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { addDays } from "date-fns";
+import { updateEvent } from "@/lib/api";
+import { useQueryClient } from "@tanstack/react-query";
 
 type CalendarViewProps = {
   startHour?: number;
@@ -19,21 +21,23 @@ export function CalendarView({
   startHour = 0,
   endHour = 24,
 }: CalendarViewProps) {
-  const { existingEvents, proposedEvents, currentWeek, setCurrentWeek } =
+  const { existingEvents, proposedEvents, currentWeek, setCurrentWeek, updateExistingEvent } =
     useSchedulerContext();
   const { moveEvent } = useScheduler();
+  const queryClient = useQueryClient();
 
   const weekDays = getWeekDays(currentWeek);
   const totalHours = endHour - startHour;
 
   // Handle drag end - move event to new time slot
   const handleDragEnd = useCallback(
-    (event: DragEndEvent) => {
+    async (event: DragEndEvent) => {
       const { active, over } = event;
 
       if (!over || !active.data.current?.event) return;
 
       const draggedEvent = active.data.current.event;
+      const isExisting = active.data.current.isExisting === true;
       const dropData = over.data.current as {
         date: Date;
         hour: number;
@@ -52,9 +56,35 @@ export function CalendarView({
       );
       const newEnd = new Date(newStart.getTime() + duration);
 
-      moveEvent(draggedEvent.id, newStart, newEnd);
+      if (isExisting) {
+        // Update existing event locally first (optimistic update)
+        updateExistingEvent(draggedEvent.id, {
+          start: newStart,
+          end: newEnd,
+        });
+
+        // Sync to Google Calendar via API
+        try {
+          await updateEvent(draggedEvent.id, {
+            start: newStart.toISOString(),
+            end: newEnd.toISOString(),
+          });
+          // Refresh calendar data
+          queryClient.invalidateQueries({ queryKey: ["calendar"] });
+        } catch (error) {
+          console.error("Failed to update event in Google Calendar:", error);
+          // Revert on error
+          updateExistingEvent(draggedEvent.id, {
+            start: draggedEvent.start,
+            end: draggedEvent.end,
+          });
+        }
+      } else {
+        // Handle proposed event (existing behavior)
+        moveEvent(draggedEvent.id, newStart, newEnd);
+      }
     },
-    [moveEvent],
+    [moveEvent, updateExistingEvent, queryClient],
   );
 
   // Week navigation
@@ -93,25 +123,23 @@ export function CalendarView({
         <div className="flex flex-1 overflow-auto">
           {/* Day columns */}
           <div className="flex flex-1 min-w-0">
-            <div className="flex flex-col w-16 border-r border-border">
+            <div className="w-16 border-r border-border">
               {/* Empty header space */}
+              <div className="h-[60px] border-b border-border" />
+              {/* Hour labels */}
               <div>
-                <div className="h-[49px] border-b border-border" />
-                {/* Hour labels */}
-                <div className="">
-                  {hours.map((hour, index) => (
-                    <div
-                      key={hour}
-                      className="h-[60px] text-xs text-muted-foreground pr-2 relative"
-                    >
-                      <span className="top-0 right-2 -translate-y-1/2">
-                        {formatTime(
-                          new Date().setHours(hour, 0, 0, 0) as unknown as Date,
-                        )}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                {hours.map((hour) => (
+                  <div
+                    key={hour}
+                    className="h-[60px] text-xs text-muted-foreground pr-2 relative"
+                  >
+                    <span className="absolute top-0 right-2 -translate-y-1/2">
+                      {formatTime(
+                        new Date().setHours(hour, 0, 0, 0) as unknown as Date,
+                      )}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
             {weekDays.map((date) => (

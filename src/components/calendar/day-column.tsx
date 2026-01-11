@@ -51,7 +51,7 @@ export function DayColumn({
   const columnHeight = totalHours * 60; // 60px per hour
 
   return (
-    <div className="flex flex-col flex-1 min-w-0 border-r ">
+    <div className="flex flex-col flex-1 min-w-0 border-r border-border">
       {/* Day header */}
       <div
         className={cn(
@@ -67,7 +67,7 @@ export function DayColumn({
 
       {/* Time grid */}
       <div
-        className="relative flex-1 border-r border-border last:border-r-0"
+        className="relative"
         style={{ height: `${columnHeight}px` }}
       >
         {/* Time slots (droppable zones) */}

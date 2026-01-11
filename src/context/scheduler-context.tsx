@@ -27,6 +27,7 @@ type SchedulerContextValue = {
 
   // Actions
   setExistingEvents: (events: CalendarEvent[]) => void
+  updateExistingEvent: (id: string, updates: Partial<CalendarEvent>) => void
   setProposedEvents: (
     eventsOrUpdater: ProposedEvent[] | ((prev: ProposedEvent[]) => ProposedEvent[])
   ) => void
@@ -59,6 +60,17 @@ export function SchedulerProvider({ children }: { children: ReactNode }) {
   const [messages, setMessages] = useState<Message[]>([])
   const [isStreaming, setIsStreaming] = useState(false)
   const [currentWeek, setCurrentWeek] = useState(new Date())
+
+  const updateExistingEvent = useCallback(
+    (id: string, updates: Partial<CalendarEvent>) => {
+      setExistingEvents(prev =>
+        prev.map(event =>
+          event.id === id ? { ...event, ...updates } : event
+        )
+      )
+    },
+    []
+  )
 
   const updateProposedEvent = useCallback(
     (id: string, updates: Partial<ProposedEvent>) => {
@@ -123,6 +135,7 @@ export function SchedulerProvider({ children }: { children: ReactNode }) {
         isStreaming,
         currentWeek,
         setExistingEvents,
+        updateExistingEvent,
         setProposedEvents,
         updateProposedEvent,
         addProposedEvent,
