@@ -71,7 +71,7 @@ async def create_my_agent():
 
     llm = ChatOpenAI(
         model="google/gemini-3-flash-preview",
-        api_key=os.getenv("OPENROUTER_API_KEY")
+        api_key=os.getenv("OPENROUTER_API_KEY"),
         openai_api_base="https://openrouter.ai/api/v1",
         temperature=0.7
     )

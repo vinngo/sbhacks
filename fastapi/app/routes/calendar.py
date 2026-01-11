@@ -31,11 +31,13 @@ async def get_calendar_events(
     # Parse the ISO date strings
     start_date = datetime.fromisoformat(start.replace("Z", "+00:00"))
     end_date = datetime.fromisoformat(end.replace("Z", "+00:00"))
-    
-    # TODO: Fetch events from Google Calendar API using MCP
-    # For now, return empty array
+
+    # Fetch events from Google Calendar API using MCP
+    result = await fetch_events(start, end)
+    # Parse the agent's response to extract events
+    # For now, return empty array until response parsing is implemented
     events: list[CalendarEvent] = []
-    
+
     return events
 
 
