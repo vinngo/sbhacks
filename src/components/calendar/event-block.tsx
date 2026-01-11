@@ -1,7 +1,9 @@
 "use client";
 
+import { useState } from "react";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { motion } from "framer-motion";
 import { cn, formatTime, getEventPosition } from "@/lib/utils";
 import type { CalendarEvent } from "@/lib/types";
 import { GripVertical } from "lucide-react";
@@ -15,6 +17,8 @@ type EventBlockProps = {
 const COMPACT_HEIGHT_THRESHOLD = 35;
 
 export function EventBlock({ event, dayStartHour = 6 }: EventBlockProps) {
+  const [isHovered, setIsHovered] = useState(false);
+
   const { top, height } = getEventPosition(
     event.start,
     event.end,
@@ -36,18 +40,27 @@ export function EventBlock({ event, dayStartHour = 6 }: EventBlockProps) {
   const isCompact = height < COMPACT_HEIGHT_THRESHOLD;
 
   return (
-    <div
+    <motion.div
       ref={setNodeRef}
       className={cn(
         "absolute left-1 right-1 rounded-md px-2",
-        "bg-[var(--event-existing)] text-[var(--event-existing-text)]",
+        "bg-gray-200 text-foreground",
         "text-[10px] font-medium overflow-hidden",
-        "cursor-grab transition-colors duration-200",
-        "border-2 border-transparent hover:border-black",
+        "cursor-grab",
+        "border border-border",
         isCompact ? "py-0.5 flex items-center" : "py-1",
-        isDragging && "opacity-50 z-50 shadow-lg cursor-grabbing",
+        isDragging && "opacity-50 z-50 cursor-grabbing",
       )}
       style={style}
+      onHoverStart={() => setIsHovered(true)}
+      onHoverEnd={() => setIsHovered(false)}
+      animate={{
+        boxShadow: isHovered
+          ? "0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)"
+          : "0 1px 2px 0 rgba(0, 0, 0, 0.05)",
+        y: isHovered ? -2 : 0,
+      }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
       {...attributes}
       {...listeners}
     >
@@ -72,6 +85,6 @@ export function EventBlock({ event, dayStartHour = 6 }: EventBlockProps) {
           </div>
         </div>
       )}
-    </div>
+    </motion.div>
   );
 }
