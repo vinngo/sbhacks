@@ -28,9 +28,11 @@ export function MessageList({ messages, isStreaming }: MessageListProps) {
   return (
     <ScrollArea className="flex-1" ref={scrollAreaRef}>
       <div className="px-3 py-2">
-        {messages.map((message) => (
-          <Message key={message.id} message={message} />
-        ))}
+        {messages
+          .filter((message) => message.content.trim() !== "")
+          .map((message) => (
+            <Message key={message.id} message={message} />
+          ))}
 
         {/* Typing indicator - iMessage style */}
         {isStreaming && (
