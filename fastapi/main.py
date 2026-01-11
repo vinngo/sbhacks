@@ -4,7 +4,7 @@ from dotenv import load_dotenv
 
 from app.routes import calendar, chat
 
-load_dotenv()
+load_dotenv("app/.env")
 
 app = FastAPI(title="Schedule Optimizer API")
 
