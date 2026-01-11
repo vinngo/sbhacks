@@ -236,7 +236,7 @@ export function EventBlock({ event, dayStartHour = 6, onResize }: EventBlockProp
       {/* Bottom resize handle */}
       <motion.div
         className={cn(
-          "absolute -bottom-1 left-0 right-0 h-4 cursor-ns-resize z-10",
+          "absolute bottom-4 left-0 right-0 h-4 cursor-ns-resize z-10",
           "flex items-center justify-center",
         )}
         initial={{ opacity: 0 }}
