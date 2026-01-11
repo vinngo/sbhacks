@@ -13,6 +13,7 @@ type DayColumnProps = {
   proposedEvents: ProposedEvent[];
   startHour?: number;
   endHour?: number;
+  onEventResize?: (eventId: string, newStart: Date, newEnd: Date) => void;
 };
 
 export function DayColumn({
@@ -21,6 +22,7 @@ export function DayColumn({
   proposedEvents,
   startHour = 6,
   endHour = 22,
+  onEventResize,
 }: DayColumnProps) {
   const isToday = isSameDay(date, new Date());
 
@@ -51,7 +53,7 @@ export function DayColumn({
   const columnHeight = totalHours * 60; // 60px per hour
 
   return (
-    <div className="flex flex-col flex-1 min-w-0 border-r border-border">
+    <div className="flex flex-col flex-1 min-w-0 border-r ">
       {/* Day header */}
       <div
         className={cn(
@@ -67,7 +69,7 @@ export function DayColumn({
 
       {/* Time grid */}
       <div
-        className="relative"
+        className="relative flex-1 border-r border-border last:border-r-0"
         style={{ height: `${columnHeight}px` }}
       >
         {/* Time slots (droppable zones) */}
@@ -81,9 +83,14 @@ export function DayColumn({
           />
         ))}
 
-        {/* Existing events (solid, not draggable) */}
+        {/* Existing events */}
         {dayExistingEvents.map((event) => (
-          <EventBlock key={event.id} event={event} dayStartHour={startHour} />
+          <EventBlock 
+            key={event.id} 
+            event={event} 
+            dayStartHour={startHour}
+            onResize={onEventResize}
+          />
         ))}
 
         {/* Proposed events (draggable) */}

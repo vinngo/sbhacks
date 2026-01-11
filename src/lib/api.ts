@@ -43,21 +43,6 @@ export async function commitEvents(
   return res.json();
 }
 
-// Update an existing calendar event
-export async function updateEvent(
-  eventId: string,
-  updates: { start?: string; end?: string; title?: string },
-): Promise<void> {
-  const res = await fetch(`/api/calendar/${eventId}`, {
-    method: "PATCH",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(updates),
-  });
-  if (!res.ok) {
-    throw new Error("Failed to update event");
-  }
-}
-
 // Stream chat response
 export async function* streamChat(
   messages: Message[],

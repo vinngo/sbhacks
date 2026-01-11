@@ -9,7 +9,6 @@ import { useScheduler } from "@/hooks/use-scheduler";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { addDays } from "date-fns";
-import { updateEvent } from "@/lib/api";
 import { useQueryClient } from "@tanstack/react-query";
 
 type CalendarViewProps = {
@@ -21,7 +20,7 @@ export function CalendarView({
   startHour = 0,
   endHour = 24,
 }: CalendarViewProps) {
-  const { existingEvents, proposedEvents, currentWeek, setCurrentWeek, updateExistingEvent } =
+  const { existingEvents, proposedEvents, currentWeek, setCurrentWeek, setExistingEvents } =
     useSchedulerContext();
   const { moveEvent } = useScheduler();
   const queryClient = useQueryClient();
@@ -37,7 +36,7 @@ export function CalendarView({
       if (!over || !active.data.current?.event) return;
 
       const draggedEvent = active.data.current.event;
-      const isExisting = active.data.current.isExisting === true;
+      const isExisting = active.data.current.isExisting;
       const dropData = over.data.current as {
         date: Date;
         hour: number;
@@ -57,34 +56,72 @@ export function CalendarView({
       const newEnd = new Date(newStart.getTime() + duration);
 
       if (isExisting) {
-        // Update existing event locally first (optimistic update)
-        updateExistingEvent(draggedEvent.id, {
-          start: newStart,
-          end: newEnd,
-        });
+        // Handle existing event - update via API
+        setExistingEvents(
+          existingEvents.map((e) =>
+            e.id === draggedEvent.id ? { ...e, start: newStart, end: newEnd } : e
+          )
+        );
 
-        // Sync to Google Calendar via API
         try {
-          await updateEvent(draggedEvent.id, {
-            start: newStart.toISOString(),
-            end: newEnd.toISOString(),
+          const res = await fetch(`/api/calendar/${draggedEvent.id}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              start: newStart.toISOString(),
+              end: newEnd.toISOString(),
+            }),
           });
+
+          if (!res.ok) throw new Error("Failed to update");
+
           // Refresh calendar data
           queryClient.invalidateQueries({ queryKey: ["calendar"] });
         } catch (error) {
-          console.error("Failed to update event in Google Calendar:", error);
-          // Revert on error
-          updateExistingEvent(draggedEvent.id, {
-            start: draggedEvent.start,
-            end: draggedEvent.end,
-          });
+          console.error("Failed to move event:", error);
+          // Refresh to revert
+          queryClient.invalidateQueries({ queryKey: ["calendar"] });
         }
       } else {
-        // Handle proposed event (existing behavior)
+        // Handle proposed event
         moveEvent(draggedEvent.id, newStart, newEnd);
       }
     },
-    [moveEvent, updateExistingEvent, queryClient],
+    [moveEvent, existingEvents, setExistingEvents, queryClient],
+  );
+
+  // Handle event resize
+  const handleEventResize = useCallback(
+    async (eventId: string, newStart: Date, newEnd: Date) => {
+      // Update local state optimistically
+      setExistingEvents(
+        existingEvents.map((e) =>
+          e.id === eventId ? { ...e, start: newStart, end: newEnd } : e
+        )
+      );
+
+      // Sync to backend
+      try {
+        const res = await fetch(`/api/calendar/${eventId}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            start: newStart.toISOString(),
+            end: newEnd.toISOString(),
+          }),
+        });
+
+        if (!res.ok) throw new Error("Failed to update");
+
+        // Refresh calendar data
+        queryClient.invalidateQueries({ queryKey: ["calendar"] });
+      } catch (error) {
+        console.error("Failed to resize event:", error);
+        // Refresh to revert
+        queryClient.invalidateQueries({ queryKey: ["calendar"] });
+      }
+    },
+    [existingEvents, setExistingEvents, queryClient]
   );
 
   // Week navigation
@@ -123,23 +160,25 @@ export function CalendarView({
         <div className="flex flex-1 overflow-auto">
           {/* Day columns */}
           <div className="flex flex-1 min-w-0">
-            <div className="w-16 border-r border-border">
+            <div className="flex flex-col w-16 border-r border-border">
               {/* Empty header space */}
-              <div className="h-[60px] border-b border-border" />
-              {/* Hour labels */}
               <div>
-                {hours.map((hour) => (
-                  <div
-                    key={hour}
-                    className="h-[60px] text-xs text-muted-foreground pr-2 relative"
-                  >
-                    <span className="absolute top-0 right-2 -translate-y-1/2">
-                      {formatTime(
-                        new Date().setHours(hour, 0, 0, 0) as unknown as Date,
-                      )}
-                    </span>
-                  </div>
-                ))}
+                <div className="h-[49px] border-b border-border" />
+                {/* Hour labels */}
+                <div className="">
+                  {hours.map((hour, index) => (
+                    <div
+                      key={hour}
+                      className="h-[60px] text-xs text-muted-foreground pr-2 relative"
+                    >
+                      <span className="top-0 right-2 -translate-y-1/2">
+                        {formatTime(
+                          new Date().setHours(hour, 0, 0, 0) as unknown as Date,
+                        )}
+                      </span>
+                    </div>
+                  ))}
+                </div>
               </div>
             </div>
             {weekDays.map((date) => (
@@ -150,6 +189,7 @@ export function CalendarView({
                 proposedEvents={proposedEvents}
                 startHour={startHour}
                 endHour={endHour}
+                onEventResize={handleEventResize}
               />
             ))}
           </div>
