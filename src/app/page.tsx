@@ -86,7 +86,7 @@ export default function Home() {
     <main className="flex flex-col h-screen">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 border-b border-border bg-background">
-        <h1 className="text-xl font-light">Schedule Optimizer</h1>
+        <h1 className="text-3xl font-light text-black">Kairo</h1>
         <Button
           variant="outline"
           size="sm"

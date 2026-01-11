@@ -18,7 +18,7 @@ type LoginScreenProps = {
 export function LoginScreen({ onGoogleLogin }: LoginScreenProps) {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background to-muted/20">
-      <Card className="w-full max-w-md mx-4">
+      <Card className="w-full max-w-md mx-4 shadow-xl">
         <CardHeader className="text-center space-y-4">
           <div className="mx-auto w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
             <Calendar className="h-6 w-6 text-primary" />
@@ -29,8 +29,8 @@ export function LoginScreen({ onGoogleLogin }: LoginScreenProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
-              <CardTitle className="text-2xl font-medium">
-                Schedule Optimizer
+              <CardTitle className="text-4xl font-medium text-black">
+                Kairo
               </CardTitle>
             </motion.div>
             <motion.div
@@ -39,7 +39,7 @@ export function LoginScreen({ onGoogleLogin }: LoginScreenProps) {
               transition={{ duration: 0.4, ease: "easeOut", delay: 0.15 }}
             >
               <CardDescription className="mt-2">
-                scheduling that understands you
+                Scheduling that works around you
               </CardDescription>
             </motion.div>
           </div>
@@ -67,13 +67,7 @@ export function LoginScreen({ onGoogleLogin }: LoginScreenProps) {
             Sign in with Google
           </Button>
 
-          <div className="text-xs text-center text-muted-foreground space-y-1">
-            <p>By signing in, you agree to let this app:</p>
-            <ul className="list-disc list-inside text-left mx-auto max-w-xs space-y-1">
-              <li>Read your calendar events</li>
-              <li>Create and modify events</li>
-              <li>Suggest schedule optimizations</li>
-            </ul>
+          <div className="text-xs text-center text-muted-foreground space-y-2">
           </div>
         </CardContent>
       </Card>

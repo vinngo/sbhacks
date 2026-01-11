@@ -61,11 +61,13 @@ export function DayColumn({
       <div
         className={cn(
           "h-[60px] flex flex-col items-center justify-center sticky top-0 bg-background z-10",
-          isToday && "bg-primary/5",
         )}
       >
         <div className="text-sm">{formatDayOfWeek(date)}</div>
-        <div className={cn("text-lg font-semibold", isToday && "text-primary")}>
+        <div className={cn(
+          "text-lg font-semibold flex items-center justify-center",
+          isToday && "h-8 w-8 rounded-full bg-primary text-primary-foreground"
+        )}>
           {formatDate(date).split(" ")[1]}
         </div>
       </div>
