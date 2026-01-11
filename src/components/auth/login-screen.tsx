@@ -29,7 +29,7 @@ export function LoginScreen({ onGoogleLogin }: LoginScreenProps) {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.4, ease: "easeOut" }}
             >
-              <CardTitle className="text-2xl font-medium font-serif">
+              <CardTitle className="text-2xl font-medium">
                 Schedule Optimizer
               </CardTitle>
             </motion.div>
