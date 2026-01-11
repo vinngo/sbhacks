@@ -59,7 +59,7 @@ export function DayColumn({
           isToday && "bg-primary/5",
         )}
       >
-        <div className="text-sm font-medium">{formatDayOfWeek(date)}</div>
+        <div className="text-sm font-serif">{formatDayOfWeek(date)}</div>
         <div className={cn("text-lg font-semibold", isToday && "text-primary")}>
           {formatDate(date).split(" ")[1]}
         </div>

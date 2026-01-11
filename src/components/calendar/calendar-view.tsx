@@ -80,7 +80,7 @@ export function CalendarView({
             <ChevronRight className="h-4 w-4" />
           </Button>
         </div>
-        <h2 className="text-lg font-semibold">
+        <h2 className="text-lg font-serif">
           {weekDays[0].toLocaleDateString("en-US", {
             month: "long",
             year: "numeric",
