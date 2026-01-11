@@ -4,7 +4,7 @@ import { MessageList } from "./message-list";
 import { ChatInput } from "./chat-input";
 import { useChat } from "@/hooks/use-chat";
 import { ActionBar } from "@/components/shared/action-bar";
-import { MessageCircle, X } from "lucide-react";
+import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
 type ChatPanelProps = {
@@ -19,13 +19,8 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
   return (
     <div className="flex flex-col h-full bg-background">
       {/* Header */}
-      <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
-        <div className="flex items-center gap-2.5">
-          <div className="h-8 w-8 rounded-full bg-foreground flex items-center justify-center">
-            <MessageCircle className="h-4 w-4 text-background" />
-          </div>
-          <span className="font-semibold text-sm">Schedule Agent</span>
-        </div>
+      <div className="flex items-center justify-between px-4 py-2.5">
+        <span className="font-semibold text-sm">Agent</span>
         {onClose && (
           <Button
             variant="ghost"
@@ -50,7 +45,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
       </div>
 
       {/* Bottom input area */}
-      <div className="border-t border-border bg-background">
+      <div className="bg-background">
         <ActionBar />
         <ChatInput onSend={sendMessage} disabled={isStreaming} />
       </div>
