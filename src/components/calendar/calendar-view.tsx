@@ -165,7 +165,7 @@ export function CalendarView({
               style={{ minHeight: `${60 + totalHours * 60}px` }}
             >
               {/* Empty header space to align with day headers */}
-              <div className="h-[60px] border-b border-border flex-shrink-0" />
+              <div className="h-[60px] flex-shrink-0" />
               {/* Hour labels */}
               <div className="flex-1">
                 {hours.map((hour) => (
