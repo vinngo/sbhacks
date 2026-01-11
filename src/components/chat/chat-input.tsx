@@ -2,8 +2,7 @@
 
 import { useState, useCallback, KeyboardEvent } from "react";
 import { Textarea } from "@/components/ui/textarea";
-import { Button } from "@/components/ui/button";
-import { Send } from "lucide-react";
+import { ArrowUp } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 type ChatInputProps = {
@@ -15,7 +14,7 @@ type ChatInputProps = {
 export function ChatInput({
   onSend,
   disabled,
-  placeholder = "Describe tasks to schedule...",
+  placeholder = "Ask about scheduling...",
 }: ChatInputProps) {
   const [input, setInput] = useState("");
 
@@ -33,28 +32,43 @@ export function ChatInput({
     }
   };
 
+  const canSend = input.trim().length > 0 && !disabled;
+
   return (
-    <div className="border-t border-border relative">
-      <Textarea
-        value={input}
-        onChange={(e) => setInput(e.target.value)}
-        onKeyDown={handleKeyDown}
-        placeholder={placeholder}
-        disabled={disabled}
+    <div className="px-3 py-2">
+      <div
         className={cn(
-          "min-h-[60px] max-h-[150px] resize-none border-transparent shadow-none focus-visible:border-transparent !ring-0 focus-visible:!ring-0",
-          disabled && "opacity-50",
+          "relative flex items-end rounded-full bg-muted",
+          "transition-all duration-200",
         )}
-        rows={2}
-      />
-      <div className="flex justify-end pr-2">
-        <Button
+      >
+        <Textarea
+          value={input}
+          onChange={(e) => setInput(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder={placeholder}
+          disabled={disabled}
+          className={cn(
+            "min-h-[36px] max-h-[100px] resize-none border-0 bg-transparent pl-4 pr-11 py-2",
+            "text-[15px] placeholder:text-muted-foreground",
+            "focus-visible:ring-0 focus-visible:ring-offset-0",
+            disabled && "opacity-50",
+          )}
+          rows={1}
+        />
+        <button
           onClick={handleSend}
-          disabled={!input.trim() || disabled}
-          size="sm"
+          disabled={!canSend}
+          className={cn(
+            "absolute right-1.5 bottom-1.5 h-7 w-7 rounded-full",
+            "flex items-center justify-center transition-all duration-150",
+            canSend
+              ? "bg-foreground text-background"
+              : "bg-transparent text-muted-foreground/30",
+          )}
         >
-          <Send className="h-4 w-4" />
-        </Button>
+          <ArrowUp className="h-4 w-4" strokeWidth={2.5} />
+        </button>
       </div>
     </div>
   );

@@ -4,7 +4,6 @@ import { useEffect, useRef } from "react";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Message } from "./message";
 import type { Message as MessageType } from "@/lib/types";
-import { Loader2 } from "lucide-react";
 
 type MessageListProps = {
   messages: MessageType[];
@@ -27,17 +26,22 @@ export function MessageList({ messages, isStreaming }: MessageListProps) {
   }
 
   return (
-    <ScrollArea className="flex-1 p-3" ref={scrollAreaRef}>
-      <div className="space-y-0">
+    <ScrollArea className="flex-1" ref={scrollAreaRef}>
+      <div className="px-3 py-2">
         {messages.map((message) => (
           <Message key={message.id} message={message} />
         ))}
 
-        {/* Typing indicator */}
+        {/* Typing indicator - iMessage style */}
         {isStreaming && (
-          <div className="flex items-center gap-2 text-muted-foreground py-2">
-            <Loader2 className="h-4 w-4 animate-spin" />
-            <span className="text-sm">Thinking...</span>
+          <div className="flex justify-start mb-1.5">
+            <div className="bg-muted rounded-[20px] rounded-bl-[4px] px-4 py-2.5">
+              <div className="flex gap-1 items-center h-[21px]">
+                <span className="h-2 w-2 rounded-full bg-foreground/40 animate-pulse" />
+                <span className="h-2 w-2 rounded-full bg-foreground/40 animate-pulse [animation-delay:0.2s]" />
+                <span className="h-2 w-2 rounded-full bg-foreground/40 animate-pulse [animation-delay:0.4s]" />
+              </div>
+            </div>
           </div>
         )}
 

@@ -13,16 +13,16 @@ export function Message({ message }: MessageProps) {
   return (
     <div
       className={cn(
-        "flex w-full mb-2 min-w-0",
+        "flex w-full mb-1.5",
         isUser ? "justify-end" : "justify-start",
       )}
     >
       <div
         className={cn(
-          "max-w-[85%] min-w-0 rounded-lg px-3 py-2 text-sm break-words overflow-hidden",
+          "max-w-[85%] min-w-0 px-3.5 py-2 text-[15px] leading-[1.4] break-words overflow-hidden",
           isUser
-            ? "bg-primary text-primary-foreground"
-            : "bg-muted text-foreground",
+            ? "bg-foreground text-background rounded-[20px] rounded-br-[4px]"
+            : "bg-muted text-foreground rounded-[20px] rounded-bl-[4px]",
         )}
       >
         {/* Simple markdown-like rendering for code blocks */}
@@ -35,9 +35,17 @@ export function Message({ message }: MessageProps) {
             return (
               <pre
                 key={i}
-                className="bg-background/50 rounded p-2 my-2 text-xs overflow-x-auto w-full"
+                className={cn(
+                  "rounded-lg p-2.5 my-1.5 text-xs overflow-x-auto w-full",
+                  isUser ? "bg-background/20" : "bg-background/50",
+                )}
               >
-                <code className="block whitespace-pre-wrap break-all">
+                <code
+                  className={cn(
+                    "block whitespace-pre-wrap break-all",
+                    isUser ? "text-background/90" : "text-foreground/90",
+                  )}
+                >
                   {code || language}
                 </code>
               </pre>
@@ -48,7 +56,11 @@ export function Message({ message }: MessageProps) {
             <span key={i} className="whitespace-pre-wrap break-words">
               {part.split(/(\*\*.*?\*\*)/g).map((segment, j) => {
                 if (segment.startsWith("**") && segment.endsWith("**")) {
-                  return <strong key={j}>{segment.slice(2, -2)}</strong>;
+                  return (
+                    <strong key={j} className="font-semibold">
+                      {segment.slice(2, -2)}
+                    </strong>
+                  );
                 }
                 return segment;
               })}
