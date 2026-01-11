@@ -24,12 +24,7 @@ export function ChatPanel({ onClose }: ChatPanelProps) {
           <div className="h-8 w-8 rounded-full bg-foreground flex items-center justify-center">
             <MessageCircle className="h-4 w-4 text-background" />
           </div>
-          <div className="flex flex-col">
-            <span className="font-semibold text-sm leading-tight">
-              Schedule Assistant
-            </span>
-            <span className="text-xs text-muted-foreground">AI Assistant</span>
-          </div>
+          <span className="font-semibold text-sm">Schedule Agent</span>
         </div>
         {onClose && (
           <Button
