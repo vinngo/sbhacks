@@ -160,25 +160,26 @@ export function CalendarView({
         <div className="flex flex-1 overflow-auto">
           {/* Day columns */}
           <div className="flex flex-1 min-w-0">
-            <div className="flex flex-col w-20 border-r border-border">
-              {/* Empty header space */}
-              <div>
-                <div className="h-[49px] border-b border-border" />
-                {/* Hour labels */}
-                <div className="">
-                  {hours.map((hour, index) => (
-                    <div
-                      key={hour}
-                      className="h-[60px] text-xs text-muted-foreground flex items-start justify-center relative"
-                    >
-                      <span className="-translate-y-1/2">
-                        {formatTime(
-                          new Date().setHours(hour, 0, 0, 0) as unknown as Date,
-                        )}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+            <div 
+              className="flex flex-col w-20 border-r border-border"
+              style={{ minHeight: `${60 + totalHours * 60}px` }}
+            >
+              {/* Empty header space to align with day headers */}
+              <div className="h-[60px] border-b border-border flex-shrink-0" />
+              {/* Hour labels */}
+              <div className="flex-1">
+                {hours.map((hour) => (
+                  <div
+                    key={hour}
+                    className="h-[60px] text-xs text-muted-foreground flex items-start justify-center relative"
+                  >
+                    <span className="-translate-y-1/2">
+                      {formatTime(
+                        new Date().setHours(hour, 0, 0, 0) as unknown as Date,
+                      )}
+                    </span>
+                  </div>
+                ))}
               </div>
             </div>
             {weekDays.map((date) => (
