@@ -51,6 +51,152 @@ sbhacks/
 └── next.config.ts               # Next.js configuration
 ```
 
+## System Architecture
+
+The application follows a three-tier architecture with a React frontend, FastAPI backend, and MCP server for Google Calendar integration.
+
+### Architecture Overview
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│                         Frontend Layer                          │
+│                    (Next.js + React - Port 3000)                │
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌────────────────────┐   │
+│  │   UI Layer   │  │  State Mgmt  │  │  Authentication    │   │
+│  │              │  │              │  │                    │   │
+│  │ - Calendar   │  │ - React      │  │ - NextAuth.js      │   │
+│  │   Components │  │   Context    │  │ - Google OAuth     │   │
+│  │ - Chat UI    │  │ - TanStack   │  │ - Session Mgmt     │   │
+│  │ - Drag/Drop  │  │   Query      │  │                    │   │
+│  └──────────────┘  └──────────────┘  └────────────────────┘   │
+│                            │                                     │
+└────────────────────────────┼─────────────────────────────────────┘
+                             │ HTTP/REST + Server-Sent Events
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                        Backend Layer                            │
+│                   (FastAPI - Port 8000)                         │
+│                                                                  │
+│  ┌──────────────┐  ┌──────────────┐  ┌────────────────────┐   │
+│  │  API Routes  │  │   AI Agent   │  │   Data Models      │   │
+│  │              │  │              │  │                    │   │
+│  │ - /calendar  │  │ - LangChain  │  │ - Pydantic         │   │
+│  │ - /chat      │  │ - LangGraph  │  │ - Message Schema   │   │
+│  │              │  │ - ReAct      │  │ - Event Schema     │   │
+│  │              │  │   Agent      │  │                    │   │
+│  └──────────────┘  └──────────────┘  └────────────────────┘   │
+│                            │                                     │
+└────────────────────────────┼─────────────────────────────────────┘
+                             │ MCP Protocol (HTTP)
+                             ▼
+┌─────────────────────────────────────────────────────────────────┐
+│                    Integration Layer                            │
+│           (Google Calendar MCP Server - Port 8080)              │
+│                                                                  │
+│  ┌──────────────────────────────────────────────────────────┐  │
+│  │                    MCP Server                            │  │
+│  │                                                          │  │
+│  │  - OAuth Token Management                               │  │
+│  │  - Calendar API Integration                             │  │
+│  │  - Tool Interface (list_events, create_event, etc.)     │  │
+│  │                                                          │  │
+│  └──────────────────────────────────────────────────────────┘  │
+│                            │                                     │
+└────────────────────────────┼─────────────────────────────────────┘
+                             │ Google Calendar API
+                             ▼
+                    ┌─────────────────────┐
+                    │   Google Calendar   │
+                    │      Service        │
+                    └─────────────────────┘
+                             │
+                             ▼
+                    ┌─────────────────────┐
+                    │   LLM Provider      │
+                    │  (OpenRouter/       │
+                    │   Gemini Flash)     │
+                    └─────────────────────┘
+```
+
+### Data Flow
+
+#### 1. User Authentication Flow
+```
+User → Next.js → NextAuth → Google OAuth → Session Created
+```
+
+#### 2. Calendar Event Fetching Flow
+```
+User Loads Calendar
+  → Frontend (use-calendar hook)
+  → Next.js API Route (/api/calendar)
+  → FastAPI (/api/calendar/events)
+  → MCP Server (list_events tool)
+  → Google Calendar API
+  → Response flows back through the chain
+  → UI updates with events
+```
+
+#### 3. AI Chat & Scheduling Flow
+```
+User Sends Chat Message
+  → Frontend (use-chat hook)
+  → Next.js API Route (/api/chat)
+  → FastAPI (/api/chat) with streaming
+  → LangChain Agent receives message + current scheduler state
+  → Agent analyzes request and decides which tools to use
+  → Agent calls MCP tools via MultiServerMCPClient
+  → MCP Server executes Google Calendar operations
+  → LLM (Gemini Flash via OpenRouter) generates response
+  → Response streams back word-by-word to frontend
+  → UI updates in real-time
+```
+
+#### 4. Event Creation/Modification Flow
+```
+User Accepts AI Suggestion
+  → Frontend commits proposed events
+  → Next.js API Route (/api/calendar POST)
+  → FastAPI (/api/calendar/events)
+  → Agent creates events via MCP
+  → MCP Server calls Google Calendar API
+  → Event created and confirmed
+  → Calendar refetches and updates UI
+```
+
+### Key Components
+
+#### Frontend (Next.js)
+- **Pages & Routing**: App Router handles navigation
+- **State Management**:
+  - React Context for global scheduler state
+  - TanStack Query for server state caching
+  - Custom hooks (use-calendar, use-chat, use-scheduler)
+- **UI Components**:
+  - Calendar grid with drag-and-drop event management
+  - Chat interface with streaming responses
+  - Auth components for Google sign-in
+
+#### Backend (FastAPI)
+- **API Layer**: RESTful endpoints for calendar and chat operations
+- **AI Agent** ([agent.py:68-90](fastapi/app/agent.py#L68-L90)):
+  - LangGraph ReAct agent with custom system prompt
+  - Integrates LLM (Gemini Flash via OpenRouter)
+  - Connects to MCP server for tool execution
+  - Manages conversation history and state
+- **Streaming**: Server-Sent Events for real-time chat responses
+
+#### MCP Server (Google Calendar Integration)
+- **Protocol**: Implements Model Context Protocol over HTTP
+- **Authentication**: Manages OAuth 2.0 token refresh
+- **Tools Exposed**:
+  - `list_events`: Fetch calendar events
+  - `create_event`: Create new events
+  - `update_event`: Modify existing events
+  - `delete_event`: Remove events
+- **Transport**: HTTP on port 8080 for agent communication
+
 ## Tech Stack
 
 ### Frontend
