@@ -1,6 +1,6 @@
-# SBHacks Schedule Optimizer
+# Kairo: An Intelligent Schedule Optimizer
 
-An intelligent calendar scheduling application built with Next.js and FastAPI that uses AI to optimize your schedule. The app integrates with Google Calendar and uses LangChain with Google's Gemini AI to provide smart scheduling suggestions through a chat interface.
+A calendar scheduling application inspired by Cursor; built with Next.js and FastAPI that uses AI to optimize your schedule. The app integrates with Google Calendar and uses LangChain with Google Gemini 3 Flash to provide smart scheduling suggestions through a chat interface.
 
 ## Project Structure
 
