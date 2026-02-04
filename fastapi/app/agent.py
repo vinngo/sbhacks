@@ -1,18 +1,17 @@
-from langchain_mcp_adapters.client import MultiServerMCPClient
-from langgraph.prebuilt import create_react_agent
-from langchain_openai import ChatOpenAI
-from langchain_core.messages import SystemMessage
 import os
 
+from langchain_core.messages import SystemMessage
+from langchain_mcp_adapters.client import MultiServerMCPClient
+from langchain_openai import ChatOpenAI
+from langgraph.prebuilt import create_react_agent
 
 client = MultiServerMCPClient(
     {
         "google_calendar": {
             "transport": "streamable_http",  # HTTP-based remote server
             # Ensure you start your weather server on port 8000
-            "url": "http://localhost:8080",
+            "url": os.getenv("GCAL_MCP_URL"),
         }
-
     }
 )
 
@@ -65,32 +64,27 @@ SYSTEM_PROMPT = """You are an intelligent calendar scheduling assistant. Your go
 - Confirm before making any changes to the calendar
 """
 
+
 async def create_my_agent():
     tools = await client.get_tools()
-
 
     llm = ChatOpenAI(
         model="google/gemini-3-flash-preview",
         api_key=os.getenv("OPENROUTER_API_KEY"),
         openai_api_base="https://openrouter.ai/api/v1",
-        temperature=0.7
+        temperature=0.7,
     )
-
-
 
     # Initialize Gemini Flash 3.0 Preview model
 
-
-    agent = create_react_agent(
-        llm,
-        tools,
-        prompt=SYSTEM_PROMPT
-    )
+    agent = create_react_agent(llm, tools, prompt=SYSTEM_PROMPT)
 
     return agent
 
+
 # Cached agent instance
 _agent = None
+
 
 async def get_agent():
     """Get or create the agent instance."""
@@ -98,6 +92,7 @@ async def get_agent():
     if _agent is None:
         _agent = await create_my_agent()
     return _agent
+
 
 async def run_agent_with_history(messages: list[dict]) -> str:
     """
@@ -121,6 +116,7 @@ async def run_agent_with_history(messages: list[dict]) -> str:
 
     return "No response generated"
 
+
 async def get_calendar_events(start: str, end: str) -> dict:
     """
     Fetch calendar events using the MCP tools.
@@ -136,9 +132,7 @@ async def get_calendar_events(start: str, end: str) -> dict:
 
     prompt = f"List all calendar events between {start} and {end}. Return the events as a structured list."
 
-    result = await agent.ainvoke({
-        "messages": [{"role": "user", "content": prompt}]
-    })
+    result = await agent.ainvoke({"messages": [{"role": "user", "content": prompt}]})
 
     # The agent will use MCP tools to fetch events
     if "messages" in result:
@@ -148,7 +142,10 @@ async def get_calendar_events(start: str, end: str) -> dict:
 
     return {"response": "", "raw": result}
 
-async def create_calendar_event(summary: str, start: str, end: str, description: str = "") -> dict:
+
+async def create_calendar_event(
+    summary: str, start: str, end: str, description: str = ""
+) -> dict:
     """
     Create a calendar event using the MCP tools.
 
@@ -167,9 +164,7 @@ async def create_calendar_event(summary: str, start: str, end: str, description:
     if description:
         prompt += f" Description: {description}"
 
-    result = await agent.ainvoke({
-        "messages": [{"role": "user", "content": prompt}]
-    })
+    result = await agent.ainvoke({"messages": [{"role": "user", "content": prompt}]})
 
     if "messages" in result:
         for msg in reversed(result["messages"]):
