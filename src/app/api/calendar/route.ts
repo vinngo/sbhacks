@@ -3,6 +3,20 @@ import { USE_MOCK_DATA, mockCalendarEvents } from "@/lib/mock-data";
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 
+interface GoogleEvent {
+  id: string;
+  summary: string;
+  start: {
+    dateTime: string;
+    date?: string;
+  };
+  end: {
+    dateTime: string;
+    date?: string;
+  };
+  source: string;
+}
+
 // GET /api/calendar - Fetch calendar events from Google Calendar API
 export async function GET(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
@@ -52,20 +66,6 @@ export async function GET(request: NextRequest) {
 
     const calendarsData = await calendarsResponse.json();
     const calendars = calendarsData.items || [];
-
-    interface GoogleEvent {
-      id: string;
-      summary: string;
-      start: {
-        dateTime: string;
-        date?: string;
-      };
-      end: {
-        dateTime: string;
-        date?: string;
-      };
-      source: string;
-    }
 
     // Fetch events from each calendar
     const allEvents: GoogleEvent[] = [];
@@ -205,8 +205,8 @@ async function fetchEventsForCalendar(
   calendarId: string,
   start: string | null,
   end: string | null,
-): Promise<[]> {
-  let allEvents: any[] = [];
+): Promise<GoogleEvent[]> {
+  let allEvents: GoogleEvent[] = [];
   let pageToken: string | null = null;
 
   do {
