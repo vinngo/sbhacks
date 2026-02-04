@@ -53,19 +53,6 @@ export async function GET(request: NextRequest) {
     const calendarsData = await calendarsResponse.json();
     const calendars = calendarsData.items || [];
 
-    // Fetch events from each calendar
-    const allEvents = [];
-
-    for (const calendar of calendars) {
-      const events = await fetchEventsForCalendar(
-        accessToken,
-        calendar.id,
-        start,
-        end,
-      );
-      allEvents.push(...events);
-    }
-
     interface GoogleEvent {
       id: string;
       summary: string;
@@ -78,6 +65,19 @@ export async function GET(request: NextRequest) {
         date?: string;
       };
       source: string;
+    }
+
+    // Fetch events from each calendar
+    const allEvents: GoogleEvent[] = [];
+
+    for (const calendar of calendars) {
+      const events = await fetchEventsForCalendar(
+        accessToken,
+        calendar.id,
+        start,
+        end,
+      );
+      allEvents.push(...events);
     }
 
     // Transform Google Calendar events to our CalendarEvent format
